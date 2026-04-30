@@ -11,7 +11,7 @@ def generate_launch_description():
                 package="kinect_ros2",
                 executable="kinect_ros2_node",
                 name="kinect_ros2",
-                namespace="kinect",
+                namespace="kinect"
             ),
         ]
     )
