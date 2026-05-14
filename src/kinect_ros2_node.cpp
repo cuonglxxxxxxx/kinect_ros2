@@ -14,7 +14,6 @@ rclcpp::node_interfaces::NodeBaseInterface::SharedPtr get_depth_image_proc_compo
   auto classes = loader->getAvailableClasses<rclcpp_components::NodeFactory>();
 
   rclcpp::NodeOptions options;
-  options.use_intra_process_comms(true);
   options.arguments({
     "--ros-args",
     "-r", "image_rect:=/kinect/depth/image_raw",
@@ -45,7 +44,6 @@ int main(int argc, char * argv[])
 
   rclcpp::executors::MultiThreadedExecutor exec;
   rclcpp::NodeOptions options;
-  options.use_intra_process_comms(true);
 
   auto kinect_component = std::make_shared<kinect_ros2::KinectRosComponent>(options);
   auto depth_image_proc_component = get_depth_image_proc_component();
