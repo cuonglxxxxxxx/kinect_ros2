@@ -139,13 +139,8 @@ void KinectRosComponent::rgb_cb(freenect_device * dev, void * rgb_ptr, uint32_t 
 
 void KinectRosComponent::timer_callback()
 {
-  static int tick = 0;
-  static int depth_count = 0;
-  int ret = freenect_process_events(fn_ctx_);
-  if (++tick % 100 == 0) {
-    RCLCPP_INFO(get_logger(), "timer ticks=%d freenect_ret=%d depth_frames=%d depth_flag=%d",
-      tick, ret, depth_count, (int)_depth_flag);
-  }
+  freenect_process_events(fn_ctx_);
+
   auto header = std_msgs::msg::Header();
   header.frame_id = "kinect_depth";
 
@@ -154,7 +149,6 @@ void KinectRosComponent::timer_callback()
   depth_info_.header.stamp = stamp;
 
   if (_depth_flag) {
-    ++depth_count;
     auto msg = cv_bridge::CvImage(header, "16UC1", _depth_image).toImageMsg();
     depth_img_pub_->publish(*msg);
     depth_info_pub_->publish(depth_info_);
@@ -165,9 +159,6 @@ void KinectRosComponent::timer_callback()
     auto msg = cv_bridge::CvImage(std_msgs::msg::Header(), "rgb8", _rgb_image).toImageMsg();
     rgb_img_pub_->publish(*msg);
     rgb_info_pub_->publish(rgb_info_);
-
-    // cv::imshow("RGB", _rgb_image);
-    // cv::waitKey(1);
     _rgb_flag = false;
   }
 }
