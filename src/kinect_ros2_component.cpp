@@ -35,8 +35,11 @@ KinectRosComponent::KinectRosComponent(const rclcpp::NodeOptions & options)
   depth_info_ = depth_info_manager_->getCameraInfo();
   depth_info_.header.frame_id = "kinect_depth";
 
-  depth_pub_ = image_transport::create_camera_publisher(this, "depth/image_raw");
-  rgb_pub_ = image_transport::create_camera_publisher(this, "image_raw");
+  auto qos = rclcpp::SensorDataQoS();
+  depth_img_pub_ = this->create_publisher<sensor_msgs::msg::Image>("depth/image_raw", qos);
+  depth_info_pub_ = this->create_publisher<sensor_msgs::msg::CameraInfo>("depth/camera_info", qos);
+  rgb_img_pub_ = this->create_publisher<sensor_msgs::msg::Image>("image_raw", qos);
+  rgb_info_pub_ = this->create_publisher<sensor_msgs::msg::CameraInfo>("camera_info", qos);
 
   int ret = freenect_init(&fn_ctx_, NULL);
   if (ret < 0) {
@@ -153,16 +156,15 @@ void KinectRosComponent::timer_callback()
   if (_depth_flag) {
     ++depth_count;
     auto msg = cv_bridge::CvImage(header, "16UC1", _depth_image).toImageMsg();
-    depth_pub_.publish(*msg, depth_info_);
-
-    // cv::imshow("Depth", _depth_image);
-    // cv::waitKey(1);
+    depth_img_pub_->publish(*msg);
+    depth_info_pub_->publish(depth_info_);
     _depth_flag = false;
   }
 
   if (_rgb_flag) {
     auto msg = cv_bridge::CvImage(std_msgs::msg::Header(), "rgb8", _rgb_image).toImageMsg();
-    rgb_pub_.publish(*msg, rgb_info_);
+    rgb_img_pub_->publish(*msg);
+    rgb_info_pub_->publish(rgb_info_);
 
     // cv::imshow("RGB", _rgb_image);
     // cv::waitKey(1);
