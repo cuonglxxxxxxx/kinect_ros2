@@ -144,9 +144,9 @@ void KinectRosComponent::timer_callback()
   auto header = std_msgs::msg::Header();
   header.frame_id = "kinect_depth";
 
-  // Đặt timestamp 100ms trong quá khứ: TF buffer luôn có sẵn TF tại thời điểm đó
-  // → slam_toolbox message filter không cần chờ → không bị queue full
-  auto stamp = now() - rclcpp::Duration::from_seconds(0.1);
+  // Đặt timestamp 300ms trong quá khứ: bù WiFi jitter giữa Pi và Desktop
+  // (TF từ Pi đến Desktop qua WiFi có thể trễ >100ms) → TF luôn sẵn sàng
+  auto stamp = now() - rclcpp::Duration::from_seconds(0.3);
   header.stamp = stamp;
   depth_info_.header.stamp = stamp;
 
