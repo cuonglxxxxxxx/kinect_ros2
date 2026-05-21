@@ -157,7 +157,11 @@ void KinectRosComponent::timer_callback()
   }
 
   if (_rgb_flag) {
-    auto msg = cv_bridge::CvImage(std_msgs::msg::Header(), "rgb8", _rgb_image).toImageMsg();
+    auto rgb_header = std_msgs::msg::Header();
+    rgb_header.frame_id = "kinect_rgb";
+    rgb_header.stamp = stamp;
+    rgb_info_.header.stamp = stamp;
+    auto msg = cv_bridge::CvImage(rgb_header, "rgb8", _rgb_image).toImageMsg();
     rgb_img_pub_->publish(*msg);
     rgb_info_pub_->publish(rgb_info_);
     _rgb_flag = false;
